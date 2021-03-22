@@ -13,6 +13,14 @@ client = gspread.authorize(credentials)
 
 
 def get_book(book_identifier: str) -> Spreadsheet:
+    """Googleスプレッドシートを取得する
+
+    Args:
+        book_identifier (str): シートのURLまたはキー
+
+    Returns:
+        Spreadsheet: gspread で定義されているSpreadsheetモデル
+    """
     if 'https' in book_identifier:
         workbook = client.open_by_url(book_identifier)
     elif 'http' in book_identifier:
@@ -22,7 +30,15 @@ def get_book(book_identifier: str) -> Spreadsheet:
     return workbook
 
 
-def collect_sheets(workbook: Spreadsheet):
+def collect_sheets(workbook: Spreadsheet) -> list:
+    """Googleスプレッドシート内にあるシートのリストを取得する
+
+    Args:
+        workbook (Spreadsheet): gspread で定義されているSpreadsheetモデル
+
+    Returns:
+        list: スプレッドシート内の全てのシートのリスト
+    """
     worksheet_list = workbook.worksheets()
     return worksheet_list
 
