@@ -1,8 +1,25 @@
 """
 GoogleSpreadSheet の値操作関連
 """
-from typing import Union
+import gspread
 from gspread.models import Worksheet, Spreadsheet
+from oauth2client.service_account import ServiceAccountCredentials
+from typing import Union
+from settings import env
+
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+credentials = ServiceAccountCredentials.from_json_keyfile_name(env.GOOGLE_JSON_KEY, scope)
+client = gspread.authorize(credentials)
+
+
+def get_book(book_identifier: str) -> Spreadsheet:
+    if 'https' in book_identifier:
+        workbook = client.open_by_url(book_identifier)
+    elif 'http' in book_identifier:
+        workbook = client.open_by_url(book_identifier)
+    else:
+        workbook = client.open_by_key(book_identifier)
+    return workbook
 
 
 def collect_sheets(workbook: Spreadsheet):

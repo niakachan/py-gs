@@ -1,14 +1,10 @@
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-from settings import env
 from functions import ss
 
-scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-credentials = ServiceAccountCredentials.from_json_keyfile_name(env.GOOGLE_JSON_KEY, scope)
-gc = gspread.authorize(credentials)
-BOOK_ID = env.BOOK_ID
 
-book = gc.open_by_key(BOOK_ID)
+BOOK_ID = '1sEt1V9mXT2CM7h94AgV4se3hZQlc2HzZ_ha01bzGuc0'
+BOOK_URL = 'https://docs.google.com/spreadsheets/d/1sEt1V9mXT2CM7h94AgV4se3hZQlc2HzZ_ha01bzGuc0'
+
+book = ss.get_book(BOOK_URL)
 
 sheets = ss.collect_sheets(book)
 
@@ -20,8 +16,8 @@ print(import_value)
 import_value = ss.get_cell(sheet, 'B1')
 print(import_value)
 
-result = ss.update_cell(sheet, 'A1', 'テスト')
+result = ss.update_cell(sheet, 'A1', 'TEST')
 print(result)
 
-result = ss.update_cell(sheet, [1, 2], '書き換え')
+result = ss.update_cell(sheet, [1, 2], 'WRIGHTING')
 print(result)

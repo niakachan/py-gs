@@ -11,8 +11,6 @@ Python からスプレッドシートを操作するテスト用のアプリ
 GOOGLE_JSON_KEY="{filename}"
 # キーファイルが保存されているディレクトリ
 SECRETS_DIRECTORY="./secrets"
-# スプレッドシートのID
-BOOK_ID="{id_key}"
 ```
 
 `SECRETS_DIRECTORY`を変更した場合は`.gitignore`の書き換えを忘れずに
