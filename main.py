@@ -9,16 +9,19 @@ gc = gspread.authorize(credentials)
 BOOK_ID = env.BOOK_ID
 
 book = gc.open_by_key(BOOK_ID)
-print(book)
 
-sheets = ss.get_sheets(book)
+sheets = ss.collect_sheets(book)
 
-sheet = book.sheet1
+sheet = ss.get_sheet(book, 'シート1')
 
-import_value = ss.get_cell([1, 1], sheet)
-
+import_value = ss.get_cell(sheet, [1, 1])
 print(import_value)
 
-result = ss.update_cell([1, 2], value='test', sheet=sheet)
+import_value = ss.get_cell(sheet, 'B1')
+print(import_value)
 
+result = ss.update_cell(sheet, 'A1', 'テスト')
+print(result)
+
+result = ss.update_cell(sheet, [1, 2], '書き換え')
 print(result)
