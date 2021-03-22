@@ -21,9 +21,7 @@ def get_book(book_identifier: str) -> Spreadsheet:
     Returns:
         Spreadsheet: gspread で定義されているSpreadsheetモデル
     """
-    if 'https' in book_identifier:
-        workbook = client.open_by_url(book_identifier)
-    elif 'http' in book_identifier:
+    if 'http' in book_identifier:
         workbook = client.open_by_url(book_identifier)
     else:
         workbook = client.open_by_key(book_identifier)
