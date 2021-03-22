@@ -61,6 +61,20 @@ def get_sheet(workbook: Spreadsheet, sheet_identifier: Union[str, int]) -> Union
     return worksheet
 
 
+def update_sheet_title(sheet: Union[Worksheet, None], title) -> dict:
+    if sheet:
+        old_title = sheet.title
+        if old_title != title:
+            sheet.update_title(title)
+            new_title = sheet.title
+            response = {'result': 'Success', 'old_title': old_title, 'new_title': new_title}
+        else:
+            response = {'result': 'Same title as before.', 'old_title': old_title}
+    else:
+        response = {'result': 'The sheet does not exist.'}
+    return response
+
+
 def get_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str]) -> Union[str, None]:
     """スプレッドシートのセルから値を取得する
 
@@ -75,7 +89,7 @@ def get_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str]) -> Uni
     if sheet:
         if type(coordinate) == str:
             value = str(sheet.acell(coordinate).value)
-        elif type(coordinate) == list:
+        elif type(coordinate) == list and len(coordinate) == 2:
             value = str(sheet.cell(coordinate[0], coordinate[1]).value)
         else:
             value = None
@@ -84,7 +98,7 @@ def get_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str]) -> Uni
     return value
 
 
-def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], value: Union[str, int]) -> Union[dict, None]:
+def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], value: Union[str, int]) -> dict:
     """スプレッドシートのセルの内容を更新する
 
     Args:
@@ -98,14 +112,19 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
     """
     if sheet:
         old_value = get_cell(sheet, coordinate)
-        if type(coordinate) == str:
-            sheet.update_acell(coordinate, value)
-            response = {'Label': coordinate, 'Old_value': old_value, 'New_value': value}
-        elif type(coordinate) == list:
-            sheet.update_cell(coordinate[0], coordinate[1], value)
-            response = {'Row': coordinate[0], 'Col': coordinate[1], 'Old_value': old_value, 'New_value': value}
+        if old_value != value:
+            if type(coordinate) == str:
+                sheet.update_acell(coordinate, value)
+                new_value = get_cell(sheet, coordinate)
+                response = {'result': 'Success', 'label': coordinate, 'old_value': old_value, 'new_value': new_value}
+            elif type(coordinate) == list and len(coordinate) == 2:
+                sheet.update_cell(coordinate[0], coordinate[1], value)
+                new_value = get_cell(sheet, coordinate)
+                response = {'result': 'Success', 'row': coordinate[0], 'col': coordinate[1], 'old_value': old_value, 'new_value': new_value}
+            else:
+                response = {'result': 'Wrong argument.', 'old_value': old_value}
         else:
-            response = None
+            response = {'result': 'Same value as before.', 'old_value': old_value}
     else:
-        response = None
+        response = response = {'result': 'The sheet does not exist.'}
     return response
