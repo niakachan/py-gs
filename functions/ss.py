@@ -3,7 +3,7 @@ Functions for GoogleSpreadSheet
 """
 
 def get_cell(sheet: any, cell: str):
-    """Get value from Google Spread Sheet cell
+    """Return value from Google Spread Sheet cell
 
     Args:
         sheet (any): Sheet model of gspread
@@ -14,3 +14,15 @@ def get_cell(sheet: any, cell: str):
     """
     value = sheet.acell(cell).value
     return value
+
+def get_sheets(workbook):
+    """Return list of sheets in workbook
+
+    Args:
+        workbook (any): Workbook model of gspread
+
+    Returns:
+        list: Worksheets
+    """
+    worksheet_list = workbook.worksheets()
+    return worksheet_list
