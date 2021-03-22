@@ -9,8 +9,12 @@ sheets = ss.get_sheet_collection(book)
 print(sheets)
 
 sheet = ss.get_sheet(book, 0)
+print(sheet)
 
-response = ss.update_sheet_title(sheet, '新しいタイトル')
+response = ss.create_sheet(book, '新規シート3', [10, 20])
+print(response)
+
+response = ss.update_sheet_title(sheet, 'New Title 2')
 print(response)
 old_title = response.get('old_title')
 response = ss.update_sheet_title(sheet, old_title)
@@ -25,5 +29,5 @@ print(import_value)
 result = ss.update_cell(sheet, 'A1', 'TESTING')
 print(result)
 
-result = ss.update_cell(sheet, [1, 2], 'going fine')
+result = ss.update_cell(sheet, [1, 1], 'going fine')
 print(result)

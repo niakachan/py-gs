@@ -41,6 +41,33 @@ def get_sheet_collection(workbook: Spreadsheet) -> list:
     return worksheet_list
 
 
+def create_sheet(workbook: Spreadsheet, title: str, size: list) -> dict:
+    """新しいシートを作成する
+
+    Args:
+        workbook (Spreadsheet): gspread で定義されているSpreadsheetモデル
+        title (str): 作成するシートのタイトル
+        size (list): 作成するシートのサイズ[row, col]
+        e.g. [10, 20]
+    Returns:
+        dict: 作成結果
+    """
+    sheets = get_sheet_collection(workbook)
+    sheet_titles = [sheet.title for sheet in sheets]
+    if title not in sheet_titles and len(size) == 2:
+        workbook.add_worksheet(title=title, rows=size[0], cols=size[1])
+        new_sheet = get_sheet(workbook, title)
+        response = {'result': 'Success', 'sheet': new_sheet}
+    elif title in sheet_titles:
+        sheet = get_sheet(workbook, title)
+        response = {'result': 'Failure', 'message': 'The sheet already exists.', 'sheet': sheet}
+    elif len(size) != 2:
+        response = {'result': 'Failure', 'message': 'The size specification is wrong.'}
+    else:
+        response = {'result': 'Failure', 'message': 'Undefined error'}
+    return response
+
+
 def get_sheet(workbook: Spreadsheet, sheet_identifier: Union[str, int]) -> Union[Worksheet, None]:
     """シートをWorksheetとして取得する。
 
@@ -69,9 +96,9 @@ def update_sheet_title(sheet: Union[Worksheet, None], title) -> dict:
             new_title = sheet.title
             response = {'result': 'Success', 'old_title': old_title, 'new_title': new_title}
         else:
-            response = {'result': 'Same title as before.', 'old_title': old_title}
+            response = {'result': 'Failure', 'message': 'Same title as before.', 'old_title': old_title}
     else:
-        response = {'result': 'The sheet does not exist.'}
+        response = {'result': 'Failure', 'message': 'The sheet does not exist.'}
     return response
 
 
@@ -122,9 +149,9 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
                 new_value = get_cell(sheet, coordinate)
                 response = {'result': 'Success', 'row': coordinate[0], 'col': coordinate[1], 'old_value': old_value, 'new_value': new_value}
             else:
-                response = {'result': 'Wrong argument.', 'old_value': old_value}
+                response = {'result': 'Failure', 'message': 'Wrong argument.', 'old_value': old_value}
         else:
-            response = {'result': 'Same value as before.', 'old_value': old_value}
+            response = {'result': 'Failure', 'message': 'Same value as before.', 'old_value': old_value}
     else:
-        response = response = {'result': 'The sheet does not exist.'}
+        response = response = {'result': 'Failure', 'message': 'The sheet does not exist.'}
     return response
