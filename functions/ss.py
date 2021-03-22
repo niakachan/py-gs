@@ -41,6 +41,20 @@ def get_sheet_collection(workbook: Spreadsheet) -> list:
     return worksheet_list
 
 
+def get_sheet_titles(workbook: Spreadsheet) -> list:
+    """Googleスプレッドシート内にあるシートのタイトルリストを取得する
+
+    Args:
+        workbook (Spreadsheet): gspread で定義されているSpreadsheetモデル
+
+    Returns:
+        list: スプレッドシート内の全てのシートのタイトルリスト
+    """
+    sheets = get_sheet_collection(workbook)
+    sheet_titles = [sheet.title for sheet in sheets]
+    return sheet_titles
+
+
 def create_sheet(workbook: Spreadsheet, title: str, size: list) -> dict:
     """新しいシートを作成する
 
@@ -52,8 +66,7 @@ def create_sheet(workbook: Spreadsheet, title: str, size: list) -> dict:
     Returns:
         dict: 作成結果
     """
-    sheets = get_sheet_collection(workbook)
-    sheet_titles = [sheet.title for sheet in sheets]
+    sheet_titles = get_sheet_titles(workbook)
     if title not in sheet_titles and len(size) == 2:
         workbook.add_worksheet(title=title, rows=size[0], cols=size[1])
         new_sheet = get_sheet(workbook, title)
