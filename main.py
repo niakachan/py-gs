@@ -7,19 +7,18 @@ from functions import ss
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name(env.GOOGLE_JSON_KEY, scope)
 gc = gspread.authorize(credentials)
-SPREADSHEET_KEY = env.SPREADSHEET_KEY
+BOOK_ID = env.BOOK_ID
 
-book = gc.open_by_key(SPREADSHEET_KEY)
+book = gc.open_by_key(BOOK_ID)
+print(book)
 
-sheets = ss.get_sheets(book)
+# sheets = ss.get_sheets(book)
 
-print(sheets)
+# sheet = book.sheet1
 
-sheet = book.sheet1
+# import_value = ss.get_cell(sheet, 'A1')
 
-import_value = ss.get_cell(sheet, 'A1')
-
-print(import_value)
+# print(import_value)
 
 # #A1セルの値に100加算した値をB1セルに表示させる
 # export_value = import_value+100

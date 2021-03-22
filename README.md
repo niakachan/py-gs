@@ -9,7 +9,7 @@ Python からスプレッドシートを操作するテスト用のアプリ
 ```env
 GOOGLE_JSON_KEY="{ .jsonを除いたキーファイルの名前 }"
 SECRETS_DIRECTORY="./secrets"
-SPREADSHEET_KEY="{ スプレッドシートのキー }"
+BOOK_ID="{ スプレッドシートのID }"
 ```
 
 `SECRETS_DIRECTORY`を変更した場合は`.gitignore`の書き換えを忘れずに
