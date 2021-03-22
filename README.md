@@ -7,9 +7,12 @@ Python からスプレッドシートを操作するテスト用のアプリ
 環境変数設定のために`.env`を用意してください。
 
 ```env
-GOOGLE_JSON_KEY="{ .jsonを除いたキーファイルの名前 }"
+# .jsonを除いたキーファイルの名前
+GOOGLE_JSON_KEY="{filename}"
+# キーファイルが保存されているディレクトリ
 SECRETS_DIRECTORY="./secrets"
-BOOK_ID="{ スプレッドシートのID }"
+# スプレッドシートのID
+BOOK_ID="{id_key}"
 ```
 
 `SECRETS_DIRECTORY`を変更した場合は`.gitignore`の書き換えを忘れずに
