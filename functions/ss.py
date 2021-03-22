@@ -28,7 +28,7 @@ def get_book(book_identifier: str) -> Spreadsheet:
     return workbook
 
 
-def collect_sheets(workbook: Spreadsheet) -> list:
+def get_sheet_collection(workbook: Spreadsheet) -> list:
     """Googleスプレッドシート内にあるシートのリストを取得する
 
     Args:
