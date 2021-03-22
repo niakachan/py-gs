@@ -1,10 +1,9 @@
 import gspread
-import json
-from settings import env
 from oauth2client.service_account import ServiceAccountCredentials
+from settings import env
 from functions import ss
 
-scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name(env.GOOGLE_JSON_KEY, scope)
 gc = gspread.authorize(credentials)
 BOOK_ID = env.BOOK_ID
@@ -12,14 +11,14 @@ BOOK_ID = env.BOOK_ID
 book = gc.open_by_key(BOOK_ID)
 print(book)
 
-# sheets = ss.get_sheets(book)
+sheets = ss.get_sheets(book)
 
-# sheet = book.sheet1
+sheet = book.sheet1
 
-# import_value = ss.get_cell(sheet, 'A1')
+import_value = ss.get_cell([1, 1], sheet)
 
-# print(import_value)
+print(import_value)
 
-# #A1セルの値に100加算した値をB1セルに表示させる
-# export_value = import_value+100
-# sheet.update_cell(1,2, export_value)
+result = ss.update_cell([1, 2], value='test', sheet=sheet)
+
+print(result)
