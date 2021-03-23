@@ -11,13 +11,20 @@ print(sheets)
 sheet = ss.get_sheet(book, 0)
 print(sheet)
 
-response = ss.create_sheet(book, '新規シート3', [10, 20])
+response = ss.create_sheet(book, 'NewSheet', [1000, 1000])
 print(response)
 
-response = ss.update_sheet_title(sheet, 'New Title 2')
+new_sheet = response.get('sheet')
+
+response = ss.delete_sheet(book, new_sheet)
 print(response)
-old_title = response.get('old_title')
-response = ss.update_sheet_title(sheet, old_title)
+
+old_title = sheet.title
+
+response = ss.update_sheet_title(book, sheet, 'シート2')
+print(response)
+
+response = ss.update_sheet_title(book, sheet, old_title)
 print(response)
 
 import_value = ss.get_cell(sheet, [1, 1])

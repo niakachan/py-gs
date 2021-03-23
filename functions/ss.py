@@ -66,18 +66,19 @@ def create_sheet(workbook: Spreadsheet, title: str, size: list) -> dict:
     Returns:
         dict: 作成結果
     """
+    action = 'create_sheet'
     sheet_titles = get_sheet_titles(workbook)
     if title not in sheet_titles and len(size) == 2:
         workbook.add_worksheet(title=title, rows=size[0], cols=size[1])
         new_sheet = get_sheet(workbook, title)
-        response = {'result': 'Success', 'message': 'Created a sheet: {}'.format(title), 'sheet': new_sheet}
+        response = {'action:': action, 'result': 'Success', 'message': 'Created a sheet: {}'.format(title), 'sheet': new_sheet}
     elif title in sheet_titles:
         sheet = get_sheet(workbook, title)
-        response = {'result': 'Failure', 'message': 'The sheet already exists.', 'sheet': sheet}
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet already exists.', 'sheet': sheet}
     elif len(size) != 2:
-        response = {'result': 'Failure', 'message': 'The size specification is wrong.'}
+        response = {'action:': action, 'result': 'Failure', 'message': 'The size specification is wrong.', 'sheet': None}
     else:
-        response = {'result': 'Failure', 'message': 'Undefined error'}
+        response = {'action:': action, 'result': 'Failure', 'message': 'Undefined error', 'sheet': None}
     return response
 
 
@@ -91,11 +92,12 @@ def delete_sheet(workbook: Spreadsheet, sheet: Union[Worksheet, None]) -> dict:
     Returns:
         dict: 削除結果
     """
+    action = 'delete_sheet'
     if sheet:
         workbook.del_worksheet(sheet)
-        response = {'result': 'Success', 'message': 'Deleted a sheet: {}'.format(sheet.title)}
+        response = {'action:': action, 'result': 'Success', 'message': 'Deleted a sheet: {}'.format(sheet.title)}
     else:
-        response = {'result': 'Failure', 'message': 'The sheet does not exist.'}
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.'}
     return response
 
 
@@ -119,17 +121,32 @@ def get_sheet(workbook: Spreadsheet, sheet_identifier: Union[str, int]) -> Union
     return worksheet
 
 
-def update_sheet_title(sheet: Union[Worksheet, None], title) -> dict:
-    if sheet:
-        old_title = sheet.title
-        if old_title != title:
-            sheet.update_title(title)
-            new_title = sheet.title
-            response = {'result': 'Success', 'message': 'Updated sheet title {} to {}'.format(old_title, new_title), 'old_title': old_title, 'new_title': new_title}
+def update_sheet_title(workbook: Spreadsheet, sheet: Union[Worksheet, None], title) -> dict:
+    """シートのタイトルを変更する
+
+    Args:
+        workbook (Spreadsheet): gspread で定義されているSpreadsheetモデル
+        sheet (Union[Worksheet, None]): gspread で定義されているWorksheetモデル
+        title ([type]): 新しくつけるタイトル
+
+    Returns:
+        dict: 更新結果
+    """
+    action = 'update_sheet_title'
+    sheet_titles = get_sheet_titles(workbook)
+    if title not in sheet_titles:
+        if sheet:
+            old_title = sheet.title
+            if old_title != title:
+                sheet.update_title(title)
+                new_title = sheet.title
+                response = {'action:': action, 'result': 'Success', 'message': 'Updated sheet title {} to {}'.format(old_title, new_title), 'sheet': sheet}
+            else:
+                response = {'action:': action, 'result': 'Failure', 'message': 'Same title as before.', 'sheet': sheet}
         else:
-            response = {'result': 'Failure', 'message': 'Same title as before.', 'old_title': old_title}
+            response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'sheet': None}
     else:
-        response = {'result': 'Failure', 'message': 'The sheet does not exist.'}
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet already exists.', 'sheet': sheet}
     return response
 
 
@@ -168,6 +185,7 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
     Returns:
         Union[dict, None]: 更新結果の辞書
     """
+    action = 'update_cell'
     if sheet:
         old_value = get_cell(sheet, coordinate)
         if old_value != value:
@@ -175,16 +193,16 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
                 old_value = get_cell(sheet, coordinate) or 'None'
                 sheet.update_acell(coordinate, value)
                 new_value = get_cell(sheet, coordinate)
-                response = {'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'label': coordinate, 'old_value': old_value, 'new_value': new_value}
+                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'value': new_value}
             elif type(coordinate) == list and len(coordinate) == 2:
                 old_value = get_cell(sheet, coordinate) or 'None'
                 sheet.update_cell(coordinate[0], coordinate[1], value)
                 new_value = get_cell(sheet, coordinate)
-                response = {'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'row': coordinate[0], 'col': coordinate[1], 'old_value': old_value, 'new_value': new_value}
+                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'value': new_value}
             else:
-                response = {'result': 'Failure', 'message': 'Wrong argument.', 'old_value': old_value}
+                response = {'action:': action, 'result': 'Failure', 'message': 'Wrong argument.', 'value': old_value}
         else:
-            response = {'result': 'Failure', 'message': 'Same value as before.', 'old_value': old_value}
+            response = {'action:': action, 'result': 'Failure', 'message': 'Same value as before.', 'value': old_value}
     else:
-        response = response = {'result': 'Failure', 'message': 'The sheet does not exist.'}
+        response = response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'value': None}
     return response
