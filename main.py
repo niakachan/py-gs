@@ -8,7 +8,7 @@ book = ss.get_book(BOOK_URL)
 sheets = ss.get_sheet_collection(book)
 print(sheets)
 
-sheet = ss.get_sheet(book, 0)
+sheet = ss.get_sheet(book, 'Sheet1')
 print(sheet)
 
 response = ss.create_sheet(book, 'NewSheet', [1000, 1000])
