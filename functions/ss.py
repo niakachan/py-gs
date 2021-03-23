@@ -7,6 +7,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from typing import Union
 from settings import env
 
+
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name(env.GOOGLE_JSON_KEY, scope)
 client = gspread.authorize(credentials)
@@ -65,6 +66,7 @@ def create_sheet(workbook: Spreadsheet, title: str, size: list) -> dict:
         e.g. [10, 20]
     Returns:
         dict: 作成結果
+        e.g. {'action:': create_sheet, 'result': 'Success', 'message': 'Created a sheet: {sheet title}', 'data': sheet}
     """
     action = 'create_sheet'
     sheet_titles = get_sheet_titles(workbook)
@@ -91,6 +93,7 @@ def delete_sheet(workbook: Spreadsheet, sheet: Union[Worksheet, None]) -> dict:
 
     Returns:
         dict: 削除結果
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Deleted a sheet: {sheet title}, 'data': workbook}
     """
     action = 'delete_sheet'
     if sheet:
@@ -131,6 +134,7 @@ def update_sheet_title(workbook: Spreadsheet, sheet: Union[Worksheet, None], tit
 
     Returns:
         dict: 更新結果
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Updated sheet title {old_title} to {new_title}, 'data': sheet}
     """
     action = 'update_sheet_title'
     sheet_titles = get_sheet_titles(workbook)
@@ -183,7 +187,8 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
         value (Union[str, int]): 新しくセルに入れる値
 
     Returns:
-        Union[dict, None]: 更新結果の辞書
+        Union[dict, None]: 更新結果
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Updated value {old_value} to {new_value}', 'data': new_value}
     """
     action = 'update_cell'
     if sheet:
@@ -205,4 +210,113 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
             response = {'action:': action, 'result': 'Failure', 'message': 'Same value as before.', 'data': old_value}
     else:
         response = response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
+    return response
+
+
+def get_range(sheet: Union[Worksheet, None], range: str) -> list:
+    """シートの範囲を指定して1次元配列を取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): gspread で定義されているWorksheetモデル
+        range (str): 範囲 e.g. 'A1:B10'
+
+    Returns:
+        list: 範囲に含まれる値の1次元配列
+    """
+    if sheet:
+        response = sheet.range(range)
+    else:
+        response = []
+    return response
+
+
+def get_row_list(sheet: Union[Worksheet, None], row: int) -> list:
+    """行番号から値のリストを取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): gspread で定義されているWorksheetモデル
+        row (int): 行番号
+
+    Returns:
+        list: 行の値の1次元配列
+    """
+    if sheet:
+        response = sheet.row_values(row)
+    else:
+        response = []
+    return response
+
+
+def get_col_list(sheet: Union[Worksheet, None], col: int) -> list:
+    """列番号から値のリストを取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): gspread で定義されているWorksheetモデル
+        row (int): 列番号
+
+    Returns:
+        list: 行の値の1次元配列
+    """
+    if sheet:
+        response = sheet.col_values(col)
+    else:
+        response = []
+    return response
+
+
+def get_cell_list(sheet: Union[Worksheet, None]) -> list:
+    """シートから全ての値の多次元リストを取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): gspread で定義されているWorksheetモデル
+
+    Returns:
+        list: 行の値の多次元配列
+    """
+    if sheet:
+        response = sheet.get_all_values()
+    else:
+        response = []
+    return response
+
+
+def get_cell_dict(sheet: Union[Worksheet, None]) -> list:
+    """シートから全ての値を辞書形式のリストで取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): gspread で定義されているWorksheetモデル
+
+    Returns:
+        list[dict]: 辞書形式のリスト
+    """
+    if sheet:
+        response = sheet.get_all_records(empty2zero=False, head=1, default_blank='')
+    else:
+        response = [{}]
+    return response
+
+
+def search_cell(sheet: Union[Worksheet, None], string: str) -> dict:
+    """シート内から特定の値のセルを取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): [description]
+        string (str): [description]
+
+    Returns:
+        dict: 検索結果
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Contents of the cell have been retrieved. content: {content} row: {row} col: {col}, 'data': cell}
+    """
+    action = 'search_cell'
+    if sheet:
+        try:
+            cell = sheet.find(string)
+            content = str(cell.value)
+            row = str(cell.row)
+            col = str(cell.col)
+            response = {'action:': action, 'result': 'Success', 'message': 'Contents of the cell have been retrieved. content: {} row: {} col: {}'.format(content, row, col), 'data': cell}
+        except Exception:
+            response = {'action:': action, 'result': 'Failure', 'message': 'Data not found', 'data': None}
+    else:
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
     return response
