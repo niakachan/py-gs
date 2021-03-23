@@ -197,8 +197,8 @@ def get_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str]) -> Uni
     return cell
 
 
-def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], value: Union[str, int]) -> dict:
-    """スプレッドシートのセルの内容を更新する
+def update_specific_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], value: Union[str, int]) -> dict:
+    """セルの位置を指定してスプレッドシートのセルの内容を更新する
 
     Args:
         sheet (Worksheet, optional): `gspread`で定義されている`Worksheet`モデル
@@ -207,10 +207,11 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
         value (Union[str, int]): 新しくセルに入れる値
 
     Returns:
-        Union[dict, None]: 更新結果
-        e.g. {'action:': action, 'result': 'Success', 'message': 'Updated value {old_value} to {new_value}', 'data': new_value}
+        Union[dict, None]: 更新結果 `data`には更新後の`Cell`モデル
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Updated value {old_value} to {new_value}', 'data': Cell}
     """
-    action = 'update_cell'
+    action = 'update_specific_cell'
+    value = str(value)
     if sheet:
         cell = get_cell(sheet, coordinate)
         old_value = cell.value
@@ -219,18 +220,49 @@ def update_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str], val
                 sheet.update_acell(coordinate, value)
                 cell = get_cell(sheet, coordinate)
                 new_value = cell.value
-                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'data': new_value}
+                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'data': cell}
             elif type(coordinate) == list and len(coordinate) == 2:
                 sheet.update_cell(coordinate[0], coordinate[1], value)
                 cell = get_cell(sheet, coordinate)
                 new_value = cell.value
-                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'data': new_value}
+                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'data': cell}
             else:
-                response = {'action:': action, 'result': 'Failure', 'message': 'Wrong argument.', 'data': old_value}
+                response = {'action:': action, 'result': 'Failure', 'message': 'Wrong argument.', 'data': cell}
         else:
-            response = {'action:': action, 'result': 'Failure', 'message': 'Same value as before.', 'data': old_value}
+            response = {'action:': action, 'result': 'Failure', 'message': 'Same value as before.', 'data': cell}
     else:
         response = response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
+    return response
+
+
+def update_cell(sheet: Union[Worksheet, None], cell: Union[Cell, None], value: Union[str, int]) -> dict:
+    """セルを更新する
+
+    Args:
+        sheet (Union[Worksheet, None]): `gspread`で定義されている`Worksheet`モデル
+        cell (Union[Cell, None]): `gspread`で定義されている`cell`モデル
+        value (Union[str, int]): 新しくセルに代入する値
+
+    Returns:
+        dict: 更新結果 `data`には更新後の`Cell`モデル
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Updated value {old_value} to {new_value}', 'data': Cell}
+    """
+    action = 'update_cell'
+    value = str(value)
+    if sheet:
+        if cell:
+            if cell.value != value:
+                old_value = cell.value
+                response = update_specific_cell(sheet, [cell.row, cell.col], value)
+                new_cell = response['data']
+                new_value = new_cell.value
+                response = {'action:': action, 'result': 'Success', 'message': 'Updated value {} to {}'.format(old_value, new_value), 'data': new_cell}
+            else:
+                response = {'action:': action, 'result': 'Failure', 'message': 'Same value as before.', 'data': cell}
+        else:
+            response = {'action:': action, 'result': 'Failure', 'message': 'The cell does not exist.', 'data': None}
+    else:
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
     return response
 
 
@@ -324,7 +356,7 @@ def search_cell(sheet: Union[Worksheet, None], string: str) -> dict:
     return response
 
 
-def search_all_cells(sheet: Union[Worksheet, None], string: str) -> dict:
+def search_all_cells(sheet: Union[Worksheet, None], value: Union[str, int]) -> dict:
     """シート内のセルを全てリストとして取得する
 
     Args:
@@ -332,16 +364,53 @@ def search_all_cells(sheet: Union[Worksheet, None], string: str) -> dict:
         string (str): 検索文字列
 
     Returns:
-        dict: 検索結果 `data`キーの`cell`は `gspread`で定義されている`Cell`モデルのリスト
+        dict: 検索結果 `data`キーの`cells`は `gspread`で定義されている`Cell`モデルのリスト
         e.g. {'action:': action, 'result': 'Success', 'message': 'Cells found.', 'data': cells}
     """
     action = 'search_all_cells'
+    value = str(value)
     if sheet:
         try:
-            cells = sheet.findall(string)
+            cells = sheet.findall(value)
             response = {'action:': action, 'result': 'Success', 'message': 'Cells found.', 'data': cells}
         except Exception:
             response = {'action:': action, 'result': 'Failure', 'message': 'Data not found', 'data': None}
     else:
         response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
+    return response
+
+
+def update_all_cells(sheet: Union[Worksheet, None], cells_list: Union[list, None], value: Union[str, int]) -> dict:
+    """リスト内のセルを全て更新する
+
+    Args:
+        sheet (Union[Worksheet, None]): `gspread`で定義されている`Worksheet`モデル
+        cells_list (Union[list, None]): `gspread`で定義されている`Cell`モデルの`list`
+        value (Union[str, int]): セルに代入する値
+
+    Returns:
+        Returns:
+        dict: 更新結果 `data`キーの`cells`は更新後の `gspread`で定義されている`Cell`モデルのリスト
+        e.g. {'action:': action, 'result': 'Success', 'message': 'Cells found.', 'data': cells}
+    """
+    action = 'update_all_cells'
+    value = str(value)
+    new_cells_list = []
+    if sheet:
+        if cells_list:
+            for cell in cells_list:
+                if cell.value != value:
+                    response = update_cell(sheet, cell, value)
+                    new_cells_list.append(response['data'])
+                else:
+                    pass
+            update_count = len(new_cells_list)
+            if update_count > 0:
+                response = {'action:': action, 'result': 'Success', 'message': '{} cells updated'.format(update_count), 'data': new_cells_list}
+            else:
+                response = {'action:': action, 'result': 'Failure', 'message': 'No cells updated', 'data': new_cells_list}
+        else:
+            response = {'action:': action, 'result': 'Failure', 'message': 'The cells does not exist.', 'data': new_cells_list}
+    else:
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': new_cells_list}
     return response
