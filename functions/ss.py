@@ -272,7 +272,7 @@ def update_cell(sheet: Union[Worksheet, None], cell: Union[Cell, None], value: U
     return response
 
 
-def get_range(sheet: Union[Worksheet, None], range: str) -> list:
+def get_range_values(sheet: Union[Worksheet, None], range: str) -> list:
     """シートの範囲を指定して1次元配列を取得する
 
     Args:
@@ -488,6 +488,7 @@ def update_all_cells(sheet: Union[Worksheet, None], cells_list: Union[list, None
 
 # def create_cols(sheet: Union[Worksheet, None], count: int) -> dict:
 #     action = 'create_cols'
+#     added_cols = []
 #     if sheet:
 #         sheet.add_cols(count)
 
