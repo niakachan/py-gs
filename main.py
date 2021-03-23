@@ -34,7 +34,7 @@ row = 7
 row_cells = ss.get_row_cells(sheet, row)
 print(row_cells)
 
-# セルの値のリストに変換する
+# セルのリストを値のリストに変換する
 cells_values = ss.get_cells_values(row_cells)
 print(cells_values)
 
@@ -43,6 +43,6 @@ col = 4
 col_cells = ss.get_col_cells(sheet, col, 1)
 print(col_cells)
 
-# セルの値のリストに変換する
+# セルのリストを値のリストに変換する
 cells_values = ss.get_cells_values(col_cells)
 print(cells_values)
