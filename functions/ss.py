@@ -179,7 +179,7 @@ def get_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str]) -> Uni
 
     Args:
         sheet (Worksheet, optional): `gspread`で定義されている`Worksheet`モデル
-        coordinate (Union[list, str]): 取得対象セルの座標指定 ラベルでも座標でも指定可能
+        coordinate (Union[list, str]): 取得対象セルの座標指定 ラベルでも座標[row, col]でも指定可能
         e.g. `'A1'` or `[1,1]`
 
     Returns:
@@ -187,9 +187,15 @@ def get_cell(sheet: Union[Worksheet, None], coordinate: Union[list, str]) -> Uni
     """
     if sheet:
         if type(coordinate) == str:
-            cell = sheet.acell(coordinate)
+            try:
+                cell = sheet.acell(coordinate)
+            except Exception:
+                cell = None
         elif type(coordinate) == list and len(coordinate) == 2:
-            cell = sheet.cell(coordinate[0], coordinate[1])
+            try:
+                cell = sheet.cell(coordinate[0], coordinate[1])
+            except Exception:
+                cell = None
         else:
             cell = None
     else:
@@ -283,7 +289,53 @@ def get_range(sheet: Union[Worksheet, None], range: str) -> list:
     return response
 
 
-def get_row_list(sheet: Union[Worksheet, None], row: int) -> list:
+def get_row_cells(sheet: Union[Worksheet, None], row: int, ignore: int = 0) -> list:
+    """行番号を指定してセルのリストを取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): `gspread`で定義されている`Worksheet`モデル
+        row (int): 行番号
+        ignore (int): 無視する行数
+
+    Returns:
+        list: `gspread`で定義されている`Cell`モデルのリスト
+    """
+    col_count = sheet.col_count
+    cells = []
+    if sheet:
+        for i in range(col_count - ignore):
+            cell = get_cell(sheet, [row, i + 1 + ignore])
+            cells.append(cell)
+        response = cells
+    else:
+        response = []
+    return response
+
+
+def get_col_cells(sheet: Union[Worksheet, None], col: int, ignore: int = 0) -> list:
+    """列番号を指定してセルのリストを取得する
+
+    Args:
+        sheet (Union[Worksheet, None]): `gspread`で定義されている`Worksheet`モデル
+        col (int): 列番号
+        ignore (int): 無視する列数
+
+    Returns:
+        list: `gspread`で定義されている`Cell`モデルのリスト
+    """
+    col_count = sheet.col_count
+    cells = []
+    if sheet:
+        for i in range(col_count - ignore):
+            cell = get_cell(sheet, [i + 1 + ignore, col])
+            cells.append(cell)
+        response = cells
+    else:
+        response = []
+    return response
+
+
+def get_row_values(sheet: Union[Worksheet, None], row: int) -> list:
     """行番号から値のリストを取得する
 
     Args:
@@ -300,7 +352,25 @@ def get_row_list(sheet: Union[Worksheet, None], row: int) -> list:
     return response
 
 
-def get_col_list(sheet: Union[Worksheet, None], col: int) -> list:
+def get_cells_values(cells: list) -> list:
+    """セルのリストをセルの値のリストに変換する
+
+    Args:
+        cells (list): `gspread`で定義されている`Cell`モデル
+
+    Returns:
+        list: 値のリスト
+    """
+    values = []
+    for cell in cells:
+        if cell:
+            values.append(cell.value)
+        else:
+            values.append(None)
+    return values
+
+
+def get_col_values(sheet: Union[Worksheet, None], col: int) -> list:
     """列番号から値のリストを取得する
 
     Args:
@@ -317,7 +387,7 @@ def get_col_list(sheet: Union[Worksheet, None], col: int) -> list:
     return response
 
 
-def get_cell_list(sheet: Union[Worksheet, None]) -> list:
+def get_sheet_values(sheet: Union[Worksheet, None]) -> list:
     """シートから全ての値の多次元リストを取得する
 
     Args:
@@ -414,3 +484,13 @@ def update_all_cells(sheet: Union[Worksheet, None], cells_list: Union[list, None
     else:
         response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': new_cells_list}
     return response
+
+
+# def create_cols(sheet: Union[Worksheet, None], count: int) -> dict:
+#     action = 'create_cols'
+#     if sheet:
+#         sheet.add_cols(count)
+
+#     else:
+#         response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
+#     return response

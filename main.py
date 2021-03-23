@@ -1,5 +1,4 @@
 from functions import ss
-import time
 
 # スプレッドシートのURLを指定する
 BOOK_URL = 'https://docs.google.com/spreadsheets/d/1sEt1V9mXT2CM7h94AgV4se3hZQlc2HzZ_ha01bzGuc0'
@@ -25,10 +24,25 @@ response = ss.update_all_cells(sheet, found_cells, 11)
 updated_cells = response['data']
 print(response)
 
-# 3秒待つ
-time.sleep(3)
-
 # 先程値を11に置き換えたセルを全て10に戻す
 response = ss.update_all_cells(sheet, updated_cells, 10)
 updated_cells = response['data']
 print(response)
+
+# 行番号からセルのリストを取得する
+row = 7
+row_cells = ss.get_row_cells(sheet, row)
+print(row_cells)
+
+# セルの値のリストに変換する
+cells_values = ss.get_cells_values(row_cells)
+print(cells_values)
+
+# 列番号から1行目を無視してセルのリストを取得する
+col = 4
+col_cells = ss.get_col_cells(sheet, col, 1)
+print(col_cells)
+
+# セルの値のリストに変換する
+cells_values = ss.get_cells_values(col_cells)
+print(cells_values)
