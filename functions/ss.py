@@ -5,11 +5,11 @@ import gspread
 from gspread.models import Worksheet, Spreadsheet, Cell
 from oauth2client.service_account import ServiceAccountCredentials
 from typing import Union
-from settings import env
+from settings import gs_settings
 
 
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-credentials = ServiceAccountCredentials.from_json_keyfile_name(env.GOOGLE_JSON_KEY, scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name(gs_settings.GOOGLE_JSON_KEY, scope)
 client = gspread.authorize(credentials)
 
 
