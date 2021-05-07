@@ -591,12 +591,6 @@ def create_col(sheet: Union[Worksheet, None], count: int) -> dict:
     return response
 
 
-def delete_col(sheet: Union[Worksheet, None], count: int) -> dict:
-    action = 'delete_col'
-    response = init_response(action)
-    return response
-
-
 def create_row(sheet: Union[Worksheet, None], count: int) -> dict:
     """指定した数の行を増やす
 
@@ -614,6 +608,27 @@ def create_row(sheet: Union[Worksheet, None], count: int) -> dict:
         sheet.add_rows(count)
         added_cells = get_row_cells(sheet, sheet.row_count)
         response = {'action:': action, 'result': 'Success', 'message': '{} rows added.'.format(count), 'data': added_cells}
+    else:
+        response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
+    return response
+
+
+def delete_row(sheet: Union[Worksheet, None], row_number: int) -> dict:
+    """指定した番号の列を削除する
+
+    Args:
+        sheet (Union[Worksheet, None]): `gspread`で定義されている`Worksheet`モデル
+        count (int): 削除する行番号
+
+    Returns:
+        dict: 更新結果 `data`キーの`WorkSheet`は `gspread`で定義されている`WorkSheet`モデル
+        e.g. {'action:': action, 'result': 'Success', 'message': '{count} rows added', 'data': WorkSheet}
+    """
+    action = 'delete_row'
+    response = init_response(action)
+    if sheet:
+        sheet.delete_row(row_number)
+        response = {'action:': action, 'result': 'Success', 'message': 'Column deleted.', 'data': sheet}
     else:
         response = {'action:': action, 'result': 'Failure', 'message': 'The sheet does not exist.', 'data': None}
     return response
