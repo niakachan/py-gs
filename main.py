@@ -55,3 +55,11 @@ print(response)
 response = ss.get_cells_values(col_cells)
 cells_values = response['data']
 print(response)
+
+# 行を1行追加
+response = ss.create_row(sheet, 1)
+print(response)
+
+# 行を1行削除
+response = ss.delete_row(sheet, 1)
+print(response)
