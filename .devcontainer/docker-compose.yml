@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  py-gs:
+    build: ./
+    tty: true
+    working_dir: /app/py-gs/
+    container_name: py-gs
+    volumes:
+      - ..:/app/py-gs:delegated

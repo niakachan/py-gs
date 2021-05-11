@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "env": {}
+  },
+  "inputs": [],
+  "tasks": [
+    // pip関連
+    {
+      "label": "PIP: make requirements.txt using pipreqs",
+      "detail": "pipreqs を使用して requirements.txt を作成",
+      "type": "shell",
+      "presentation": {
+        "reveal": "silent",
+        "clear": true
+      },
+      "command": ["pipreqs ."]
+    },
+    // 実行関連
+    {
+      "label": "Python: Run py-gs",
+      "detail": "py-gsを実行",
+      "type": "shell",
+      "presentation": {
+        "clear": true
+      },
+      "command": ["python3 -m py-gs"]
+    }
+  ]
+}
