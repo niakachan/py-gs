@@ -11,10 +11,9 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-RUN mkdir -p /app && \
-    mkdir -p /app/py-gs
+RUN mkdir -p /opt/py-gs
 
-WORKDIR /app/py-gs
+WORKDIR /opt/py-gs
 
 RUN pip3 install --upgrade pip && \
     pip3 install --upgrade setuptools

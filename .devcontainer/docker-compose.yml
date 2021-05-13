@@ -3,8 +3,8 @@ services:
   py-gs-dev:
     build: ./
     tty: true
-    working_dir: /app/py-gs/
+    working_dir: /opt/py-gs/
     container_name: py-gs-dev
     volumes:
-      - ..:/app/py-gs:delegated
+      - ..:/opt/py-gs:delegated
       - ~/.ssh:/root/.ssh:delegated

@@ -43,5 +43,5 @@
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue"
   },
   "shutdownAction": "stopCompose",
-  "workspaceFolder": "/app/py-gs"
+  "workspaceFolder": "/opt/py-gs"
 }
